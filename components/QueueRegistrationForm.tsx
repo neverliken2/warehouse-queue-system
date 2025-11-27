@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getLiffProfile } from '@/lib/liff';
+import { isWithinWarehouseArea } from '@/lib/geolocation';
 
 export default function QueueRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -13,7 +14,8 @@ export default function QueueRegistrationForm() {
     scheduledTime: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isCheckingLocation, setIsCheckingLocation] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -25,9 +27,29 @@ export default function QueueRegistrationForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setIsCheckingLocation(true);
     setMessage(null);
 
     try {
+      // Check location first
+      const locationCheck = await isWithinWarehouseArea();
+      setIsCheckingLocation(false);
+
+      if (!locationCheck.isWithin) {
+        setMessage({
+          type: 'error',
+          text: locationCheck.message,
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Show success message for location check
+      setMessage({
+        type: 'warning',
+        text: locationCheck.message,
+      });
+
       const profile = await getLiffProfile();
 
       const { data, error } = await supabase
@@ -64,10 +86,11 @@ export default function QueueRegistrationForm() {
       console.error('Error:', error);
       setMessage({
         type: 'error',
-        text: 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง',
+        text: error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง',
       });
     } finally {
       setIsSubmitting(false);
+      setIsCheckingLocation(false);
     }
   };
 
@@ -78,10 +101,22 @@ export default function QueueRegistrationForm() {
           className={`p-4 rounded-lg ${
             message.type === 'success'
               ? 'bg-green-50 text-green-800 border border-green-200'
+              : message.type === 'warning'
+              ? 'bg-yellow-50 text-yellow-800 border border-yellow-200'
               : 'bg-red-50 text-red-800 border border-red-200'
           }`}
         >
           {message.text}
+        </div>
+      )}
+
+      {isCheckingLocation && (
+        <div className="p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-3">
+          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>กำลังตรวจสอบตำแหน่งของคุณ...</span>
         </div>
       )}
 
