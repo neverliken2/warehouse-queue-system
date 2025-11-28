@@ -1,6 +1,6 @@
-// Warehouse location coordinates
-const WAREHOUSE_LAT = 16.166019947700054;
-const WAREHOUSE_LNG = 99.72876986848814;
+// Warehouse location coordinates (Test: Your desk location)
+const WAREHOUSE_LAT = 18.7613426;
+const WAREHOUSE_LNG = 99.0604806;
 const MAX_DISTANCE_METERS = 5; // 5 meters radius
 
 /**
