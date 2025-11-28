@@ -1,7 +1,14 @@
-// Warehouse location coordinates (Test: Your desk location)
-const WAREHOUSE_LAT = 18.7613426;
-const WAREHOUSE_LNG = 99.0604806;
-const MAX_DISTANCE_METERS = 20; // 20 meters radius (to account for GPS accuracy)
+// Warehouse boundary coordinates (rectangular area)
+const WAREHOUSE_BOUNDARY = {
+  northEast: { lat: 18.761522, lng: 99.060671 }, // มุมเหนือ-ตะวันออก
+  northWest: { lat: 18.761522, lng: 99.060291 }, // มุมเหนือ-ตะวันตก
+  southWest: { lat: 18.761163, lng: 99.060291 }, // มุมใต้-ตะวันตก
+  southEast: { lat: 18.761163, lng: 99.060671 }, // มุมใต้-ตะวันออก
+};
+
+// For backward compatibility
+const WAREHOUSE_LAT = (WAREHOUSE_BOUNDARY.northEast.lat + WAREHOUSE_BOUNDARY.southWest.lat) / 2;
+const WAREHOUSE_LNG = (WAREHOUSE_BOUNDARY.northEast.lng + WAREHOUSE_BOUNDARY.southWest.lng) / 2;
 
 /**
  * Calculate distance between two coordinates using Haversine formula
@@ -60,6 +67,25 @@ export async function getCurrentLocation(): Promise<{
 }
 
 /**
+ * Check if a point is within a rectangular boundary
+ */
+function isPointInBoundary(
+  lat: number,
+  lng: number,
+  boundary: typeof WAREHOUSE_BOUNDARY
+): boolean {
+  const { northEast, southWest } = boundary;
+
+  // Check if latitude is within north-south bounds
+  const isLatInBounds = lat >= southWest.lat && lat <= northEast.lat;
+
+  // Check if longitude is within east-west bounds
+  const isLngInBounds = lng >= southWest.lng && lng <= northEast.lng;
+
+  return isLatInBounds && isLngInBounds;
+}
+
+/**
  * Check if current location is within warehouse area
  */
 export async function isWithinWarehouseArea(): Promise<{
@@ -69,6 +95,15 @@ export async function isWithinWarehouseArea(): Promise<{
 }> {
   try {
     const location = await getCurrentLocation();
+
+    // Check if within rectangular boundary
+    const isWithin = isPointInBoundary(
+      location.latitude,
+      location.longitude,
+      WAREHOUSE_BOUNDARY
+    );
+
+    // Calculate distance from center for informational purposes
     const distance = calculateDistance(
       location.latitude,
       location.longitude,
@@ -76,14 +111,12 @@ export async function isWithinWarehouseArea(): Promise<{
       WAREHOUSE_LNG
     );
 
-    const isWithin = distance <= MAX_DISTANCE_METERS;
-
     return {
       isWithin,
       distance: Math.round(distance * 10) / 10, // Round to 1 decimal
       message: isWithin
-        ? `คุณอยู่ในพื้นที่โกดัง (ระยะห่าง ${Math.round(distance * 10) / 10} เมตร)`
-        : `คุณอยู่นอกพื้นที่โกดัง (ระยะห่าง ${Math.round(distance * 10) / 10} เมตร) กรุณาเข้ามาในพื้นที่โกดังก่อนลงทะเบียน`,
+        ? `คุณอยู่ในพื้นที่โกดัง (ห่างจากจุดกลาง ${Math.round(distance * 10) / 10} เมตร)`
+        : `คุณอยู่นอกพื้นที่โกดัง (ห่างจากจุดกลาง ${Math.round(distance * 10) / 10} เมตร) กรุณาเข้ามาในพื้นที่โกดังก่อนลงทะเบียน`,
     };
   } catch (error) {
     throw new Error(
@@ -97,5 +130,5 @@ export async function isWithinWarehouseArea(): Promise<{
 export const WAREHOUSE_COORDINATES = {
   latitude: WAREHOUSE_LAT,
   longitude: WAREHOUSE_LNG,
-  maxDistanceMeters: MAX_DISTANCE_METERS,
+  boundary: WAREHOUSE_BOUNDARY,
 };
