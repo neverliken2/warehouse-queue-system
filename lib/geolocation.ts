@@ -1,7 +1,7 @@
 // Warehouse location coordinates (Test: Your desk location)
 const WAREHOUSE_LAT = 18.7613426;
 const WAREHOUSE_LNG = 99.0604806;
-const MAX_DISTANCE_METERS = 5; // 5 meters radius
+const MAX_DISTANCE_METERS = 20; // 20 meters radius (to account for GPS accuracy)
 
 /**
  * Calculate distance between two coordinates using Haversine formula
