@@ -16,6 +16,7 @@ export default function QueueRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingLocation, setIsCheckingLocation] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -33,6 +34,12 @@ export default function QueueRegistrationForm() {
     try {
       // Check location first
       const locationCheck = await isWithinWarehouseArea();
+
+      // Get and display current location for debugging
+      const { getCurrentLocation } = await import('@/lib/geolocation');
+      const location = await getCurrentLocation();
+      setCurrentLocation({ lat: location.latitude, lng: location.longitude });
+
       setIsCheckingLocation(false);
 
       if (!locationCheck.isWithin) {
@@ -96,6 +103,19 @@ export default function QueueRegistrationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {currentLocation && (
+        <div className="p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">
+          <div className="font-semibold mb-2">📍 พิกัด GPS ที่จับได้จากอุปกรณ์ของคุณ:</div>
+          <div className="font-mono text-sm space-y-1">
+            <div>Latitude: {currentLocation.lat.toFixed(7)}</div>
+            <div>Longitude: {currentLocation.lng.toFixed(7)}</div>
+          </div>
+          <div className="mt-2 text-xs text-blue-600">
+            * นี่คือพิกัดที่ GPS ของอุปกรณ์คุณจับได้ ใช้สำหรับปรับแต่งขอบเขตพื้นที่
+          </div>
+        </div>
+      )}
+
       {message && (
         <div
           className={`p-4 rounded-lg ${
