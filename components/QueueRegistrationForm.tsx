@@ -101,8 +101,11 @@ export default function QueueRegistrationForm() {
     }
   };
 
+  // Version number - auto-incremented on each deployment
+  const buildVersion = process.env.NEXT_PUBLIC_APP_VERSION || Date.now().toString().slice(-8);
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 relative">
       {currentLocation && (
         <div className="p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">
           <div className="font-semibold mb-2">📍 พิกัด GPS ที่จับได้จากอุปกรณ์ของคุณ:</div>
@@ -240,6 +243,11 @@ export default function QueueRegistrationForm() {
           'ลงทะเบียนคิว'
         )}
       </button>
+
+      {/* Version display */}
+      <div className="text-xs text-gray-400 mt-4">
+        v{buildVersion}
+      </div>
     </form>
   );
 }

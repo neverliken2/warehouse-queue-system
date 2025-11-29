@@ -5,7 +5,8 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nUpdate warehouse coordinates for location testing\n\n- Changed test location to current desk position (18.7613426, 99.0604806)\n- Keep 5 meter radius validation\n- Ready to test geolocation feature\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(gh run list:*)"
     ],
     "deny": [],
     "ask": []
