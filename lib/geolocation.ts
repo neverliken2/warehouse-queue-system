@@ -1,9 +1,16 @@
-// Warehouse boundary coordinates (rectangular area)
+// Warehouse center coordinates
+const WAREHOUSE_CENTER = {
+  lat: 18.7614235,
+  lng: 99.0605055,
+};
+
+// Expanded boundary (approximately 100 meters radius to account for GPS accuracy)
+// ~100m = 0.0009 degrees latitude, 0.0011 degrees longitude at this location
 const WAREHOUSE_BOUNDARY = {
-  northEast: { lat: 18.761650, lng: 99.060750 }, // มุมเหนือ-ตะวันออก (ขยายขอบเขตขึ้นเหนือและตะวันออกเล็กน้อย)
-  northWest: { lat: 18.761650, lng: 99.060200 }, // มุมเหนือ-ตะวันตก (ขยายขอบเขตขึ้นเหนือและตะวันตกเล็กน้อย)
-  southWest: { lat: 18.761000, lng: 99.060200 }, // มุมใต้-ตะวันตก (ขยายขอบเขตลงใต้และตะวันตกเล็กน้อย)
-  southEast: { lat: 18.761000, lng: 99.060750 }, // มุมใต้-ตะวันออก (ขยายขอบเขตลงใต้และตะวันออกเล็กน้อย)
+  northEast: { lat: 18.7623235, lng: 99.0616055 }, // +100m north, +100m east
+  northWest: { lat: 18.7623235, lng: 99.0594055 }, // +100m north, -100m west
+  southWest: { lat: 18.7605235, lng: 99.0594055 }, // -100m south, -100m west
+  southEast: { lat: 18.7605235, lng: 99.0616055 }, // -100m south, +100m east
 };
 
 // For backward compatibility
