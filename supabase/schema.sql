@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS queues (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   line_user_id VARCHAR(100),
-  notes TEXT
+  notes TEXT,
+  check_in_latitude DOUBLE PRECISION,
+  check_in_longitude DOUBLE PRECISION
 );
 
 -- Create index for faster queries
