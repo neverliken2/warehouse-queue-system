@@ -98,9 +98,32 @@ export default function QueueRegistrationForm() {
       });
     } catch (error) {
       console.error('Error:', error);
+
+      // Get detailed error message
+      let errorMessage = 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        // Supabase error object
+        const supabaseError = error as any;
+        if (supabaseError.message) {
+          errorMessage = `Database Error: ${supabaseError.message}`;
+        }
+        if (supabaseError.details) {
+          errorMessage += `\nDetails: ${supabaseError.details}`;
+        }
+        if (supabaseError.hint) {
+          errorMessage += `\nHint: ${supabaseError.hint}`;
+        }
+        if (supabaseError.code) {
+          errorMessage += `\nCode: ${supabaseError.code}`;
+        }
+      }
+
       setMessage({
         type: 'error',
-        text: error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง',
+        text: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
