@@ -42,11 +42,12 @@ function calculateDistance(
 }
 
 /**
- * Get current user location
+ * Get current user location with accuracy info
  */
 export async function getCurrentLocation(): Promise<{
   latitude: number;
   longitude: number;
+  accuracy: number;
 }> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -59,6 +60,7 @@ export async function getCurrentLocation(): Promise<{
         resolve({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy, // Accuracy in meters
         });
       },
       (error) => {
@@ -98,10 +100,22 @@ function isPointInBoundary(
 export async function isWithinWarehouseArea(): Promise<{
   isWithin: boolean;
   distance: number;
+  accuracy: number;
   message: string;
 }> {
   try {
     const location = await getCurrentLocation();
+
+    // Check GPS accuracy - warn if accuracy is poor (> 50 meters)
+    const MAX_ACCEPTABLE_ACCURACY = 50; // meters
+    if (location.accuracy > MAX_ACCEPTABLE_ACCURACY) {
+      return {
+        isWithin: false,
+        distance: 0,
+        accuracy: Math.round(location.accuracy),
+        message: `สัญญาณ GPS ไม่แม่นยำพอ (ความคลาดเคลื่อน ±${Math.round(location.accuracy)} เมตร) กรุณาลองใหม่อีกครั้งในพื้นที่โล่ง หรือรอสักครู่`,
+      };
+    }
 
     // Check if within rectangular boundary
     const isWithin = isPointInBoundary(
@@ -121,8 +135,9 @@ export async function isWithinWarehouseArea(): Promise<{
     return {
       isWithin,
       distance: Math.round(distance * 10) / 10, // Round to 1 decimal
+      accuracy: Math.round(location.accuracy),
       message: isWithin
-        ? `คุณอยู่ในพื้นที่โกดัง (ห่างจากจุดกลาง ${Math.round(distance * 10) / 10} เมตร)`
+        ? `คุณอยู่ในพื้นที่โกดัง (ห่างจากจุดกลาง ${Math.round(distance * 10) / 10} เมตร, ความแม่นยำ ±${Math.round(location.accuracy)} เมตร)`
         : `คุณอยู่นอกพื้นที่โกดัง (ห่างจากจุดกลาง ${Math.round(distance * 10) / 10} เมตร) กรุณาเข้ามาในพื้นที่โกดังก่อนลงทะเบียน`,
     };
   } catch (error) {

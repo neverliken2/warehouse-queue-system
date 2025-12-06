@@ -16,7 +16,7 @@ export default function QueueRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingLocation, setIsCheckingLocation] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null);
-  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -38,7 +38,11 @@ export default function QueueRegistrationForm() {
       // Get and display current location for debugging
       const { getCurrentLocation } = await import('@/lib/geolocation');
       const location = await getCurrentLocation();
-      setCurrentLocation({ lat: location.latitude, lng: location.longitude });
+      setCurrentLocation({
+        lat: location.latitude,
+        lng: location.longitude,
+        accuracy: location.accuracy
+      });
 
       setIsCheckingLocation(false);
 
@@ -114,6 +118,13 @@ export default function QueueRegistrationForm() {
           <div className="font-mono text-sm space-y-1">
             <div>Latitude: {currentLocation.lat.toFixed(7)}</div>
             <div>Longitude: {currentLocation.lng.toFixed(7)}</div>
+            <div className={currentLocation.accuracy <= 20 ? 'text-green-700' : currentLocation.accuracy <= 50 ? 'text-yellow-700' : 'text-red-700'}>
+              ความแม่นยำ: ±{Math.round(currentLocation.accuracy)} เมตร {
+                currentLocation.accuracy <= 20 ? '✓ ดีมาก' :
+                currentLocation.accuracy <= 50 ? '⚠ พอใช้' :
+                '✗ แย่'
+              }
+            </div>
           </div>
           <div className="mt-2 text-xs text-blue-600">
             * นี่คือพิกัดที่ GPS ของอุปกรณ์คุณจับได้ ใช้สำหรับปรับแต่งขอบเขตพื้นที่
