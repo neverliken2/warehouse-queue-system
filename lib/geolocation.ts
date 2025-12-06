@@ -1,16 +1,16 @@
-// Warehouse center coordinates (Home location for testing)
+// Warehouse center coordinates (Actual GPS reading from home)
 const WAREHOUSE_CENTER = {
-  lat: 18.2738939,
-  lng: 99.4291048,
+  lat: 18.2569378,
+  lng: 99.4411029,
 };
 
 // Boundary with 1km radius
 // ~1000m = 0.009 degrees latitude, 0.011 degrees longitude at this location
 const WAREHOUSE_BOUNDARY = {
-  northEast: { lat: 18.2828939, lng: 99.4401048 }, // +1km north, +1km east
-  northWest: { lat: 18.2828939, lng: 99.4181048 }, // +1km north, -1km west
-  southWest: { lat: 18.2648939, lng: 99.4181048 }, // -1km south, -1km west
-  southEast: { lat: 18.2648939, lng: 99.4401048 }, // -1km south, +1km east
+  northEast: { lat: 18.2659378, lng: 99.4521029 }, // +1km north, +1km east
+  northWest: { lat: 18.2659378, lng: 99.4301029 }, // +1km north, -1km west
+  southWest: { lat: 18.2479378, lng: 99.4301029 }, // -1km south, -1km west
+  southEast: { lat: 18.2479378, lng: 99.4521029 }, // -1km south, +1km east
 };
 
 // For backward compatibility
