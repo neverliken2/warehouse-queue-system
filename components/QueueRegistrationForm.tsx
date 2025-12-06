@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getLiffProfile } from '@/lib/liff';
 import { isWithinWarehouseArea } from '@/lib/geolocation';
+import { BUILD_VERSION } from '@/lib/version';
 
 export default function QueueRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -107,8 +108,6 @@ export default function QueueRegistrationForm() {
     }
   };
 
-  // Version number - auto-incremented on each deployment
-  const buildVersion = process.env.NEXT_PUBLIC_APP_VERSION || Date.now().toString().slice(-8);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 relative">
@@ -259,7 +258,7 @@ export default function QueueRegistrationForm() {
 
       {/* Version display */}
       <div className="text-xs text-gray-400 mt-4">
-        v{buildVersion}
+        v{BUILD_VERSION}
       </div>
     </form>
   );
