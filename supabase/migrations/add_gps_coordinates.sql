@@ -21,6 +21,30 @@ CREATE TRIGGER generate_queue_number_trigger
   WHEN (NEW.queue_number IS NULL OR NEW.queue_number = '')
   EXECUTE FUNCTION generate_queue_number();
 
+-- Fix generate_queue_number function to use VARCHAR(20) for date_prefix
+CREATE OR REPLACE FUNCTION generate_queue_number()
+RETURNS TRIGGER AS $$
+DECLARE
+  date_prefix VARCHAR(20);
+  sequence_num INTEGER;
+  new_queue_number VARCHAR(20);
+BEGIN
+  -- Format: Q-YYYYMMDD-XXX
+  date_prefix := 'Q-' || TO_CHAR(NEW.scheduled_time, 'YYYYMMDD');
+
+  -- Get the next sequence number for today
+  SELECT COUNT(*) + 1 INTO sequence_num
+  FROM queues
+  WHERE queue_number LIKE date_prefix || '%';
+
+  -- Generate queue number
+  new_queue_number := date_prefix || '-' || LPAD(sequence_num::TEXT, 3, '0');
+
+  NEW.queue_number := new_queue_number;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Add comment to document the columns
 COMMENT ON COLUMN queues.check_in_latitude IS 'GPS latitude coordinate where driver checked in';
 COMMENT ON COLUMN queues.check_in_longitude IS 'GPS longitude coordinate where driver checked in';

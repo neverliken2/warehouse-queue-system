@@ -26,7 +26,7 @@ CREATE INDEX IF NOT EXISTS idx_queues_line_user_id ON queues(line_user_id);
 CREATE OR REPLACE FUNCTION generate_queue_number()
 RETURNS TRIGGER AS $$
 DECLARE
-  date_prefix VARCHAR(8);
+  date_prefix VARCHAR(20);
   sequence_num INTEGER;
   new_queue_number VARCHAR(20);
 BEGIN
