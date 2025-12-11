@@ -20,22 +20,28 @@ export interface Queue {
   id: string;
   queue_number: string;
   driver_name: string;
-  phone_number: string;
   vehicle_plate: string;
-  company: string;
-  scheduled_time: string;
+  carrier: string;
+  job_type: string;
+  truck_type: 'heavy' | 'light';
+  trip_number?: string;
   status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;
   line_user_id?: string;
   notes?: string;
+  check_in_latitude?: number;
+  check_in_longitude?: number;
 }
 
 export interface QueueInsert {
   driver_name: string;
-  phone_number: string;
   vehicle_plate: string;
-  company: string;
-  scheduled_time: string;
+  carrier: string;
+  job_type: string;
+  truck_type: 'heavy' | 'light';
+  trip_number?: string;
   line_user_id?: string;
+  check_in_latitude?: number;
+  check_in_longitude?: number;
 }

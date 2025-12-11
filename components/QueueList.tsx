@@ -29,7 +29,7 @@ export default function QueueList() {
       let query = supabase
         .from('queues')
         .select('*')
-        .order('scheduled_time', { ascending: true });
+        .order('created_at', { ascending: false });
 
       if (filter === 'mine') {
         const profile = await getLiffProfile();
@@ -155,7 +155,7 @@ export default function QueueList() {
                 <div>
                   <h3 className="text-xl font-bold text-indigo-600">{queue.queue_number}</h3>
                   <p className="text-sm text-gray-500">
-                    {formatDateTime(queue.scheduled_time)}
+                    {formatDateTime(queue.created_at)}
                   </p>
                 </div>
                 <span
@@ -169,20 +169,29 @@ export default function QueueList() {
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="text-gray-600">คนขับรถ:</span>
+                  <span className="text-gray-600">ชื่อ-นามสกุล:</span>
                   <p className="font-medium">{queue.driver_name}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">เบอร์โทร:</span>
-                  <p className="font-medium">{queue.phone_number}</p>
                 </div>
                 <div>
                   <span className="text-gray-600">ทะเบียนรถ:</span>
                   <p className="font-medium">{queue.vehicle_plate}</p>
                 </div>
                 <div>
-                  <span className="text-gray-600">บริษัท:</span>
-                  <p className="font-medium">{queue.company}</p>
+                  <span className="text-gray-600">แหละพาหะนะ:</span>
+                  <p className="font-medium">{queue.carrier}</p>
+                </div>
+                <div>
+                  <span className="text-gray-600">ประเภท:</span>
+                  <p className="font-medium">
+                    {queue.truck_type === 'heavy' ? '🚛 รถหนัก' : '🚗 รถเบา'}
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-600">งาน:</span>
+                  <p className="font-medium">
+                    {queue.job_type}
+                    {queue.trip_number && ` (${queue.trip_number})`}
+                  </p>
                 </div>
               </div>
 

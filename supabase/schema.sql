@@ -3,10 +3,11 @@ CREATE TABLE IF NOT EXISTS queues (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   queue_number VARCHAR(20) UNIQUE NOT NULL,
   driver_name VARCHAR(100) NOT NULL,
-  phone_number VARCHAR(20) NOT NULL,
-  vehicle_plate VARCHAR(20) NOT NULL,
-  company VARCHAR(100) NOT NULL,
-  scheduled_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  vehicle_plate VARCHAR(50) NOT NULL,
+  carrier VARCHAR(100) NOT NULL,
+  job_type VARCHAR(100) NOT NULL,
+  truck_type VARCHAR(20) NOT NULL CHECK (truck_type IN ('heavy', 'light')),
+  trip_number VARCHAR(50),
   status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -18,9 +19,11 @@ CREATE TABLE IF NOT EXISTS queues (
 
 -- Create index for faster queries
 CREATE INDEX IF NOT EXISTS idx_queues_status ON queues(status);
-CREATE INDEX IF NOT EXISTS idx_queues_scheduled_time ON queues(scheduled_time);
+CREATE INDEX IF NOT EXISTS idx_queues_created_at ON queues(created_at);
 CREATE INDEX IF NOT EXISTS idx_queues_queue_number ON queues(queue_number);
 CREATE INDEX IF NOT EXISTS idx_queues_line_user_id ON queues(line_user_id);
+CREATE INDEX IF NOT EXISTS idx_queues_truck_type ON queues(truck_type);
+CREATE INDEX IF NOT EXISTS idx_queues_carrier ON queues(carrier);
 
 -- Create function to generate queue number
 CREATE OR REPLACE FUNCTION generate_queue_number()
@@ -30,8 +33,8 @@ DECLARE
   sequence_num INTEGER;
   new_queue_number VARCHAR(20);
 BEGIN
-  -- Format: Q-YYYYMMDD-XXX
-  date_prefix := 'Q-' || TO_CHAR(NEW.scheduled_time, 'YYYYMMDD');
+  -- Format: Q-YYYYMMDD-XXX (based on created_at)
+  date_prefix := 'Q-' || TO_CHAR(NOW(), 'YYYYMMDD');
 
   -- Get the next sequence number for today
   SELECT COUNT(*) + 1 INTO sequence_num

@@ -1,16 +1,16 @@
-// Warehouse center coordinates (Actual GPS reading from home)
+// Warehouse center coordinates (ที่ทำงานผู้ใช้จริง)
 const WAREHOUSE_CENTER = {
-  lat: 18.2569378,
-  lng: 99.4411029,
+  lat: 16.166034,
+  lng: 99.728751,
 };
 
-// Boundary with 1km radius
-// ~1000m = 0.009 degrees latitude, 0.011 degrees longitude at this location
+// Boundary with ~50m radius to handle GPS accuracy
+// ~50m = 0.00045 degrees latitude, 0.0005 degrees longitude at this location
 const WAREHOUSE_BOUNDARY = {
-  northEast: { lat: 18.2659378, lng: 99.4521029 }, // +1km north, +1km east
-  northWest: { lat: 18.2659378, lng: 99.4301029 }, // +1km north, -1km west
-  southWest: { lat: 18.2479378, lng: 99.4301029 }, // -1km south, -1km west
-  southEast: { lat: 18.2479378, lng: 99.4521029 }, // -1km south, +1km east
+  northEast: { lat: 16.166500, lng: 99.729250 }, // มุมเหนือ-ตะวันออก
+  northWest: { lat: 16.166500, lng: 99.728250 }, // มุมเหนือ-ตะวันตก
+  southWest: { lat: 16.165500, lng: 99.728250 }, // มุมใต้-ตะวันตก
+  southEast: { lat: 16.165500, lng: 99.729250 }, // มุมใต้-ตะวันออก
 };
 
 // For backward compatibility
