@@ -102,6 +102,44 @@ export default function QueueRegistrationForm() {
 
       const profile = await getLiffProfile();
 
+      // Check if user is logged in via LINE
+      if (!profile?.userId) {
+        setMessage({
+          type: 'error',
+          text: 'กรุณาเข้าสู่ระบบผ่าน LINE ก่อนลงทะเบียน',
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Check if user already registered today
+      const now = new Date();
+      const bangkokOffset = 7 * 60;
+      const localOffset = now.getTimezoneOffset();
+      const bangkokTime = new Date(now.getTime() + (bangkokOffset + localOffset) * 60 * 1000);
+      
+      const todayStart = new Date(bangkokTime);
+      todayStart.setHours(0, 0, 0, 0);
+      const todayStartUTC = new Date(todayStart.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+
+      const { data: existingQueue, error: checkError } = await supabase
+        .from('queues')
+        .select('id, queue_number')
+        .eq('line_user_id', profile.userId)
+        .gte('created_at', todayStartUTC.toISOString())
+        .limit(1);
+
+      if (checkError) throw checkError;
+
+      if (existingQueue && existingQueue.length > 0) {
+        setMessage({
+          type: 'error',
+          text: `คุณได้ลงทะเบียนคิววันนี้แล้ว (${existingQueue[0].queue_number}) ไม่สามารถลงทะเบียนซ้ำได้`,
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('queues')
         .insert([
