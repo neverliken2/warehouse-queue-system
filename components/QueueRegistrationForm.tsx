@@ -112,21 +112,28 @@ export default function QueueRegistrationForm() {
         return;
       }
 
-      // Check if user already registered today
+      // Check if user already registered in current shift (18:00 - 18:00 next day)
       const now = new Date();
       const bangkokOffset = 7 * 60;
       const localOffset = now.getTimezoneOffset();
       const bangkokTime = new Date(now.getTime() + (bangkokOffset + localOffset) * 60 * 1000);
       
-      const todayStart = new Date(bangkokTime);
-      todayStart.setHours(0, 0, 0, 0);
-      const todayStartUTC = new Date(todayStart.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+      const currentHour = bangkokTime.getHours();
+      
+      // If before 18:00, shift started yesterday at 18:00
+      // If after 18:00, shift started today at 18:00
+      const shiftStart = new Date(bangkokTime);
+      if (currentHour < 18) {
+        shiftStart.setDate(shiftStart.getDate() - 1);
+      }
+      shiftStart.setHours(18, 0, 0, 0);
+      const shiftStartUTC = new Date(shiftStart.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
 
       const { data: existingQueue, error: checkError } = await supabase
         .from('queues')
         .select('id, queue_number')
         .eq('line_user_id', profile.userId)
-        .gte('created_at', todayStartUTC.toISOString())
+        .gte('created_at', shiftStartUTC.toISOString())
         .limit(1);
 
       if (checkError) throw checkError;

@@ -23,29 +23,45 @@ export default function QueueList() {
     init();
   }, [filter]);
 
+  // Helper function to get current shift period (18:00 - 18:00 next day)
+  const getShiftPeriod = () => {
+    const now = new Date();
+    const bangkokOffset = 7 * 60; // UTC+7
+    const localOffset = now.getTimezoneOffset();
+    const bangkokTime = new Date(now.getTime() + (bangkokOffset + localOffset) * 60 * 1000);
+    
+    const currentHour = bangkokTime.getHours();
+    
+    // If before 18:00, shift started yesterday at 18:00
+    // If after 18:00, shift started today at 18:00
+    const shiftStart = new Date(bangkokTime);
+    if (currentHour < 18) {
+      shiftStart.setDate(shiftStart.getDate() - 1);
+    }
+    shiftStart.setHours(18, 0, 0, 0);
+    
+    const shiftEnd = new Date(shiftStart);
+    shiftEnd.setDate(shiftEnd.getDate() + 1);
+    shiftEnd.setHours(17, 59, 59, 999);
+    
+    // Convert back to UTC for query
+    const shiftStartUTC = new Date(shiftStart.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+    const shiftEndUTC = new Date(shiftEnd.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+    
+    return { shiftStartUTC, shiftEndUTC };
+  };
+
   const fetchQueues = async () => {
     setIsLoading(true);
     try {
-      // Get today's date range in Bangkok timezone
-      const now = new Date();
-      const bangkokOffset = 7 * 60; // UTC+7
-      const localOffset = now.getTimezoneOffset();
-      const bangkokTime = new Date(now.getTime() + (bangkokOffset + localOffset) * 60 * 1000);
-      
-      const todayStart = new Date(bangkokTime);
-      todayStart.setHours(0, 0, 0, 0);
-      const todayEnd = new Date(bangkokTime);
-      todayEnd.setHours(23, 59, 59, 999);
-      
-      // Convert back to UTC for query
-      const todayStartUTC = new Date(todayStart.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
-      const todayEndUTC = new Date(todayEnd.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+      // Get current shift period (18:00 - 18:00 next day)
+      const { shiftStartUTC, shiftEndUTC } = getShiftPeriod();
 
       let query = supabase
         .from('queues')
         .select('*')
-        .gte('created_at', todayStartUTC.toISOString())
-        .lte('created_at', todayEndUTC.toISOString())
+        .gte('created_at', shiftStartUTC.toISOString())
+        .lte('created_at', shiftEndUTC.toISOString())
         .order('created_at', { ascending: false });
 
       if (filter === 'mine') {
