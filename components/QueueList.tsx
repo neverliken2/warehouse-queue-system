@@ -226,42 +226,42 @@ export default function QueueList() {
 
   return (
     <div className="space-y-4">
-      {/* Filter Tabs and Export Button */}
-      <div className="flex justify-between items-center border-b pb-4">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setFilter('mine')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === 'mine'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            คิวของฉัน
-          </button>
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === 'all'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            คิวทั้งหมด
-          </button>
-        </div>
-        
-        {/* Export Button */}
+      {/* Filter Tabs */}
+      <div className="flex gap-2">
         <button
-          onClick={exportToExcel}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+          onClick={() => setFilter('mine')}
+          className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
+            filter === 'mine'
+              ? 'bg-indigo-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Export Excel
+          คิวของฉัน
+        </button>
+        <button
+          onClick={() => setFilter('all')}
+          className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
+            filter === 'all'
+              ? 'bg-indigo-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          คิวทั้งหมด
         </button>
       </div>
+      
+      {/* Export Button - Full Width Below */}
+      <button
+        onClick={exportToExcel}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Export Excel
+      </button>
+
+      <div className="border-t pt-4"></div>
 
       {queues.length === 0 ? (
         <div className="text-center py-12">
