@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Queue } from '@/lib/supabase';
 import { getLiffProfile } from '@/lib/liff';
+import * as XLSX from 'xlsx';
 
 export default function QueueList() {
   const [queues, setQueues] = useState<Queue[]>([]);
@@ -126,6 +127,95 @@ export default function QueueList() {
     });
   };
 
+  // Export to Excel function
+  const exportToExcel = async () => {
+    try {
+      // Get shift start time (18:00 yesterday or today)
+      const now = new Date();
+      const bangkokOffset = 7 * 60;
+      const localOffset = now.getTimezoneOffset();
+      const bangkokTime = new Date(now.getTime() + (bangkokOffset + localOffset) * 60 * 1000);
+      
+      const currentHour = bangkokTime.getHours();
+      
+      const shiftStart = new Date(bangkokTime);
+      if (currentHour < 18) {
+        shiftStart.setDate(shiftStart.getDate() - 1);
+      }
+      shiftStart.setHours(18, 0, 0, 0);
+      const shiftStartUTC = new Date(shiftStart.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+      
+      // End time is NOW
+      const nowUTC = new Date();
+
+      // Fetch data from shift start to now
+      const { data, error } = await supabase
+        .from('queues')
+        .select('*')
+        .gte('created_at', shiftStartUTC.toISOString())
+        .lte('created_at', nowUTC.toISOString())
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        alert('ไม่มีข้อมูลให้ export');
+        return;
+      }
+
+      // Format data for Excel
+      const excelData = data.map((queue, index) => ({
+        'ลำดับ': index + 1,
+        'หมายเลขคิว': queue.queue_number,
+        'ชื่อ-นามสกุล': queue.driver_name,
+        'ทะเบียนรถ': queue.vehicle_plate,
+        'แหล่งพาหนะ': queue.carrier,
+        'ประเภทรถ': queue.truck_type === 'heavy' ? 'รถหนัก' : 'รถเบา',
+        'ประเภทงาน': queue.job_type,
+        'เที่ยวรับงาน': queue.trip_number || '-',
+        'สถานะ': getStatusText(queue.status),
+        'เวลาลงทะเบียน': formatDateTime(queue.created_at),
+      }));
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(excelData);
+
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 8 },   // ลำดับ
+        { wch: 18 },  // หมายเลขคิว
+        { wch: 25 },  // ชื่อ-นามสกุล
+        { wch: 20 },  // ทะเบียนรถ
+        { wch: 25 },  // แหล่งพาหนะ
+        { wch: 12 },  // ประเภทรถ
+        { wch: 20 },  // ประเภทงาน
+        { wch: 15 },  // เที่ยวรับงาน
+        { wch: 15 },  // สถานะ
+        { wch: 25 },  // เวลาลงทะเบียน
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, 'คิวรถ');
+
+      // Generate filename with timestamp
+      const timestamp = bangkokTime.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).replace(/[/:]/g, '-').replace(/, /g, '_');
+      
+      const filename = `queue_export_${timestamp}.xlsx`;
+
+      // Download file
+      XLSX.writeFile(wb, filename);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('เกิดข้อผิดพลาดในการ export');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -136,27 +226,40 @@ export default function QueueList() {
 
   return (
     <div className="space-y-4">
-      {/* Filter Tabs */}
-      <div className="flex gap-2 border-b pb-4">
+      {/* Filter Tabs and Export Button */}
+      <div className="flex justify-between items-center border-b pb-4">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setFilter('mine')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              filter === 'mine'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            คิวของฉัน
+          </button>
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              filter === 'all'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            คิวทั้งหมด
+          </button>
+        </div>
+        
+        {/* Export Button */}
         <button
-          onClick={() => setFilter('mine')}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            filter === 'mine'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
+          onClick={exportToExcel}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
         >
-          คิวของฉัน
-        </button>
-        <button
-          onClick={() => setFilter('all')}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            filter === 'all'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          คิวทั้งหมด
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export Excel
         </button>
       </div>
 
