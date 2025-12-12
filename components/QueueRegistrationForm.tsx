@@ -269,6 +269,24 @@ export default function QueueRegistrationForm() {
       </div>
 
       <div>
+        <label htmlFor="lightTruckJob" className="block text-sm font-medium text-gray-700 mb-2">
+          รถเบา
+        </label>
+        <select
+          id="lightTruckJob"
+          name="lightTruckJob"
+          value={formData.lightTruckJob}
+          onChange={handleChange}
+          disabled={!!formData.heavyTruckJob}
+          className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white ${formData.heavyTruckJob ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+        >
+          <option value="">-- เลือกประเภทงาน --</option>
+          <option value="พร้อมรับงาน">พร้อมรับงาน</option>
+          <option value="ซ่อมรถ">ซ่อมรถ</option>
+        </select>
+      </div>
+
+      <div>
         <label htmlFor="heavyTruckJob" className="block text-sm font-medium text-gray-700 mb-2">
           รถหนัก
         </label>
@@ -304,27 +322,9 @@ export default function QueueRegistrationForm() {
         </div>
       )}
 
-      <div>
-        <label htmlFor="lightTruckJob" className="block text-sm font-medium text-gray-700 mb-2">
-          รถเบา
-        </label>
-        <select
-          id="lightTruckJob"
-          name="lightTruckJob"
-          value={formData.lightTruckJob}
-          onChange={handleChange}
-          disabled={!!formData.heavyTruckJob}
-          className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white ${formData.heavyTruckJob ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-        >
-          <option value="">-- เลือกประเภทงาน --</option>
-          <option value="พร้อมรับงาน">พร้อมรับงาน</option>
-          <option value="ซ่อมรถ">ซ่อมรถ</option>
-        </select>
-      </div>
-
       {!formData.heavyTruckJob && !formData.lightTruckJob && (
         <div className="p-3 rounded-lg bg-yellow-50 text-yellow-800 border border-yellow-200 text-sm">
-          ⚠️ กรุณาเลือกประเภทงาน (รถหนัก หรือ รถเบา)
+          ⚠️ กรุณาเลือกประเภทงาน (รถเบา หรือ รถหนัก)
         </div>
       )}
 
