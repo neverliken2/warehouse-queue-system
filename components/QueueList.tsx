@@ -26,9 +26,26 @@ export default function QueueList() {
   const fetchQueues = async () => {
     setIsLoading(true);
     try {
+      // Get today's date range in Bangkok timezone
+      const now = new Date();
+      const bangkokOffset = 7 * 60; // UTC+7
+      const localOffset = now.getTimezoneOffset();
+      const bangkokTime = new Date(now.getTime() + (bangkokOffset + localOffset) * 60 * 1000);
+      
+      const todayStart = new Date(bangkokTime);
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date(bangkokTime);
+      todayEnd.setHours(23, 59, 59, 999);
+      
+      // Convert back to UTC for query
+      const todayStartUTC = new Date(todayStart.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+      const todayEndUTC = new Date(todayEnd.getTime() - (bangkokOffset + localOffset) * 60 * 1000);
+
       let query = supabase
         .from('queues')
         .select('*')
+        .gte('created_at', todayStartUTC.toISOString())
+        .lte('created_at', todayEndUTC.toISOString())
         .order('created_at', { ascending: false });
 
       if (filter === 'mine') {
