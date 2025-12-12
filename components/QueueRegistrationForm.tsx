@@ -290,7 +290,7 @@ export default function QueueRegistrationForm() {
 
       <div>
         <label htmlFor="carrier" className="block text-sm font-medium text-gray-700 mb-2">
-          แหละพาหะนะ <span className="text-red-500">*</span>
+          แหล่งพาหนะ <span className="text-red-500">*</span>
         </label>
         <select
           id="carrier"
@@ -300,9 +300,20 @@ export default function QueueRegistrationForm() {
           required
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white"
         >
-          <option value="">-- เลือกแหละพาหะนะ --</option>
+          <option value="">-- เลือกแหล่งพาหนะ --</option>
           <option value="TBL-ขนส่งกำแพงเพชร">TBL-ขนส่งกำแพงเพชร</option>
           <option value="TBL-ขนส่งธนภักดี">TBL-ขนส่งธนภักดี</option>
+          <option value="TBL-ขนส่งมงคลสมัย">TBL-ขนส่งมงคลสมัย</option>
+          <option value="TBL-โคราช">TBL-โคราช</option>
+          <option value="TBL-ขนส่งบางบาล">TBL-ขนส่งบางบาล</option>
+          <option value="TBL-ขนส่งวังน้อย">TBL-ขนส่งวังน้อย</option>
+          <option value="TBL-ขนส่งกาญจนสิงขร">TBL-ขนส่งกาญจนสิงขร</option>
+          <option value="TBL-ขนส่งเพื่องฟู">TBL-ขนส่งเพื่องฟู</option>
+          <option value="TBL-ขนส่งสุราบางยี่ขัน">TBL-ขนส่งสุราบางยี่ขัน</option>
+          <option value="TBL-ขนส่งสุรากระทิงแดง">TBL-ขนส่งสุรากระทิงแดง</option>
+          <option value="TBL-ขนส่งแสงโสม">TBL-ขนส่งแสงโสม</option>
+          <option value="TBL-ขนส่ง Modern Trade">TBL-ขนส่ง Modern Trade</option>
+          <option value="SOW-คลังกำแพงเพชร">SOW-คลังกำแพงเพชร</option>
         </select>
       </div>
 
