@@ -25,6 +25,7 @@ export interface Queue {
   job_type: string;
   truck_type: 'heavy' | 'light';
   trip_number?: string;
+  time_slot: 'morning' | 'afternoon';
   status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;
@@ -41,6 +42,7 @@ export interface QueueInsert {
   job_type: string;
   truck_type: 'heavy' | 'light';
   trip_number?: string;
+  time_slot: 'morning' | 'afternoon';
   line_user_id?: string;
   check_in_latitude?: number;
   check_in_longitude?: number;

@@ -170,6 +170,7 @@ export default function QueueList() {
         'ชื่อ-นามสกุล': queue.driver_name,
         'ทะเบียนรถ': queue.vehicle_plate,
         'แหล่งพาหนะ': queue.carrier,
+        'ช่วงเวลา': queue.time_slot === 'morning' ? 'เช้า' : queue.time_slot === 'afternoon' ? 'บ่าย' : '-',
         'ประเภทรถ': queue.truck_type === 'heavy' ? 'รถหนัก' : 'รถเบา',
         'ประเภทงาน': queue.job_type,
         'เที่ยวรับงาน': queue.trip_number || '-',
@@ -188,6 +189,7 @@ export default function QueueList() {
         { wch: 25 },  // ชื่อ-นามสกุล
         { wch: 20 },  // ทะเบียนรถ
         { wch: 25 },  // แหล่งพาหนะ
+        { wch: 12 },  // ช่วงเวลา
         { wch: 12 },  // ประเภทรถ
         { wch: 20 },  // ประเภทงาน
         { wch: 15 },  // เที่ยวรับงาน
@@ -317,12 +319,18 @@ export default function QueueList() {
                   <p className="font-medium">{queue.carrier}</p>
                 </div>
                 <div>
+                  <span className="text-gray-600">ช่วงเวลา:</span>
+                  <p className="font-medium">
+                    {queue.time_slot === 'morning' ? '🌅 เช้า' : queue.time_slot === 'afternoon' ? '🌇 บ่าย' : '-'}
+                  </p>
+                </div>
+                <div>
                   <span className="text-gray-600">ประเภท:</span>
                   <p className="font-medium">
                     {queue.truck_type === 'heavy' ? '🚛 รถหนัก' : '🚗 รถเบา'}
                   </p>
                 </div>
-                <div className="col-span-2">
+                <div>
                   <span className="text-gray-600">งาน:</span>
                   <p className="font-medium">
                     {queue.job_type}
